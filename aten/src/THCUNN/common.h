@@ -5,7 +5,10 @@
   "Some of weight/gradient/input tensors are located on different GPUs. Please move them to a single one.")
 
 // Use 1024 threads per block, which requires cuda sm_2x or above
-const int CUDA_NUM_THREADS = 1024;
+// const int CUDA_NUM_THREADS = 1024;
+
+// patch for "too many resources requested for launch"
+constexpr int CUDA_NUM_THREADS = 512;
 
 // CUDA: number of blocks for threads.
 inline int GET_BLOCKS(const int64_t N)

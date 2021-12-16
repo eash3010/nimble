@@ -68,6 +68,9 @@ int register_node(
   nn_dag.push_back({});
   opnodes.push_back(opnode);
 
+  //std::cout<<opnode->node_id<<": ";
+  //opnode->dump();
+
   const auto& output_vals = opnode->outputs();
   for (const auto& output_val : output_vals) {
     if (output_val && output_val->hasUses()) {
@@ -112,8 +115,31 @@ DAGDecomposition::Graph build_stream_dag(
 }
 
 std::tuple<std::vector<int>, std::vector<int>> map_streams(
-    const DAGDecomposition::Graph& nn_dag) {
+    const DAGDecomposition::Graph& nn_dag,
+    const std::vector<int> &root_node_ids) {
+  //DAGDecomposition::print_dag(nn_dag);
+  /*for(int i=0;i<root_node_ids.size();i++){
+    std::cout<<root_node_ids[i]<<" ";
+  }
+  std::cout<<std::endl;
+  */
+
   DAGDecomposition::Graph nn_meg = DAGDecomposition::get_MEG(nn_dag);
+/**/
+  std::cout<<"line1"<<std::endl;
+  //const auto& res = DAGDecomposition::get_mapping_two_streams(nn_meg, root_node_ids);
+  const auto& res = DAGDecomposition::get_mapping_topo(nn_meg);
+  std::cout<<"line2"<<std::endl;
+  std::vector<int> node_to_chain = std::get<0>(res);
+  std::cout<<"line3"<<std::endl;
+  std::vector<int> chain_to_stream = std::get<1>(res);
+  std::cout<<"line4"<<std::endl;
+  int stream_num = std::get<2>(res);
+  std::cout<<"stream_num "<<stream_num<<std::endl;
+  at::cuda::autostream::generate_streams(stream_num);
+  return std::make_tuple(node_to_chain, chain_to_stream);
+/**/
+/*
   const auto& bigraph = DAGDecomposition::meg_to_bigraph(nn_meg);
   const auto& matching = DAGDecomposition::maximum_matching(bigraph);
   const auto& result = DAGDecomposition::get_mapping(matching);
@@ -127,9 +153,11 @@ std::tuple<std::vector<int>, std::vector<int>> map_streams(
 
   std::vector<int> chain_to_stream = std::get<0>(remapping);
   int stream_num = std::get<2>(remapping);
+  std::cout<<"stream_num "<<stream_num<<std::endl;
   at::cuda::autostream::generate_streams(stream_num);
 
   return std::make_tuple(node_to_chain, chain_to_stream);
+*/
 }
 
 void insert_autostream_hooks(
@@ -168,6 +196,8 @@ void insert_autostream_hooks(
 } // namespace
 
 TORCH_API void AutoStream(const std::shared_ptr<Graph> graph) {
+  //graph->dump();
+  //std::cout<<"\nGRAPH DUMPED"<<std::endl;
   auto inputs = graph->inputs();
 
   std::unordered_set<Node*> root_nodes;
@@ -185,9 +215,22 @@ TORCH_API void AutoStream(const std::shared_ptr<Graph> graph) {
   for (const auto& root_node : root_nodes)
     register_node(root_node, opnodes, node_to_parent_ids, nn_dag);
 
-  const auto& mapping_results = map_streams(nn_dag);
+  std::vector<int> root_node_ids;
+  for (const auto& root_node : root_nodes)
+    root_node_ids.push_back(root_node->node_id);
+  const auto& mapping_results = map_streams(nn_dag, root_node_ids);
   std::vector<int> node_to_chain = std::get<0>(mapping_results);
   std::vector<int> chain_to_stream = std::get<1>(mapping_results);
+  std::cout<<"node_to_chain "<<node_to_chain.size()<<std::endl;
+  for(int i=0;i<node_to_chain.size();i++){
+    std::cout<<node_to_chain[i]<<" ";
+  }
+  std::cout<<std::endl;
+  std::cout<<"chain_to_stream "<<chain_to_stream.size()<<std::endl;
+  for(int i=0;i<chain_to_stream.size();i++){
+    std::cout<<chain_to_stream[i]<<" ";
+  }
+  std::cout<<std::endl;
 
   insert_autostream_hooks(
       graph,
@@ -196,8 +239,10 @@ TORCH_API void AutoStream(const std::shared_ptr<Graph> graph) {
       nn_dag,
       node_to_chain,
       chain_to_stream);
+  std::cout<<"completed insert_autostream_hooks"<<std::endl;
 
   reset_node_id();
+  std::cout<<"completed reset_node_id"<<std::endl;
 }
 
 } // namespace jit

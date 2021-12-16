@@ -1,0 +1,41 @@
+resnet50
+stream_num 2
+node_to_chain 107
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 2 3 4 
+chain_to_stream 5
+0 1 1 1 1 
+completed insert_autostream_hooks
+completed reset_node_id
+              mean (ms)  stdev (ms)
+nimble-multi  29.968727    0.416132
+resnet101
+stream_num 2
+node_to_chain 209
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 2 3 4 
+chain_to_stream 5
+0 1 1 1 1 
+completed insert_autostream_hooks
+completed reset_node_id
+              mean (ms)  stdev (ms)
+nimble-multi  49.341567    0.530994
+inception_v3
+stream_num 2
+node_to_chain 177
+0 0 0 0 0 0 0 0 0 0 0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 10 11 0 12 0 13 0 0 0 0 0 0 14 15 16 17 18 0 0 0 0 0 0 19 20 21 22 23 24 25 26 0 0 0 0 0 0 27 28 29 0 0 0 0 0 0 0 30 31 32 33 34 35 0 0 0 0 0 0 0 0 0 36 37 38 39 40 41 42 0 0 0 0 0 0 0 0 0 43 44 45 46 47 48 49 0 0 0 0 0 0 0 0 0 50 51 52 53 54 55 56 0 0 0 0 0 0 0 0 0 57 58 0 0 0 0 0 59 60 61 62 0 0 0 0 0 63 64 65 66 67 0 0 0 0 0 68 69 70 71 72 0 0 0 0 0 73 74 
+chain_to_stream 75
+0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+completed insert_autostream_hooks
+completed reset_node_id
+              mean (ms)  stdev (ms)
+nimble-multi  50.696232    0.687042
+mobilenet_v2
+stream_num 1
+node_to_chain 109
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+chain_to_stream 1
+0 
+completed insert_autostream_hooks
+completed reset_node_id
+              mean (ms)  stdev (ms)
+nimble-multi   8.650075    0.341594
+nasnetamobile

@@ -24,6 +24,8 @@ void initCUDAContextVectors() {
 void initDeviceProperty(DeviceIndex device_index) {
   cudaDeviceProp device_prop;
   AT_CUDA_CHECK(cudaGetDeviceProperties(&device_prop, device_index));
+  // patch for "too many resources requested for launch"
+  device_prop.maxThreadsPerBlock = device_prop.maxThreadsPerBlock / 2;
   device_properties[device_index] = device_prop;
 }
 

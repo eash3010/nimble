@@ -32,6 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <utility>
 #include <algorithm>
 #include <iostream>
+#include <stack>
 
 namespace DAGDecomposition {
 
@@ -46,6 +47,15 @@ void print_dag(const Graph& dag) {
     std::cout << std::endl;
   }
 }
+
+
+void printVec(std::vector<int> v){
+    for(int i=0;i<v.size();i++){
+        std::cout<<v[i]<<" ";
+    }
+    std::cout<<std::endl;
+}
+
 
 void dfs(int start, const Graph& graph, std::vector<bool>& visited) {
   visited.at(start) = true;
@@ -171,4 +181,200 @@ std::tuple<std::vector<int>, std::vector<std::array<int, 2>>, int> get_mapping(c
   }
   return std::make_tuple(mapping, chains, group_num);
 }
+
+
+
+std::vector<int> longestCHelper(int u, const Graph& g, std::vector<int> vis, std::vector<int> l){
+  if(vis[u]!=-1){
+    return l;
+  }
+  if(g[u].size()==0){
+    l.push_back(u);
+    return l;
+  }
+  vis[u]=0;
+  l.push_back(u);
+  std::vector<int> l2;
+  for(int i=0;i<g[u].size();i++){
+    std::vector<int> l1 = longestCHelper(g[u][i], g, vis, l);
+    if(l1.size()>l2.size()){
+      l2=l1;
+    }
+  }
+  return l2;
+}
+
+std::vector<int> longestChain(int u, const Graph &g) {
+  std::vector<int> vis(g.size(), -1);
+  std::vector<int> l;
+  return longestCHelper(u, g, vis, l);
+}
+
+std::tuple<std::vector<int>, std::vector<int>, int> get_mapping_two_streams(const Graph& meg, const std::vector<int>& root_nodes) {
+  int num_vertices = meg.size();
+  std::vector<int> longestC;
+  for(int i=0;i<root_nodes.size();i++){
+    std::vector<int> tmp = longestChain(root_nodes[i], meg);
+    if(tmp.size()>longestC.size()){
+      longestC = tmp;
+    }
+  }
+  /*std::cout<<"Completed Longest chain"<<std::endl;
+  for(int i=0;i<longestC.size();i++){
+    std::cout<<longestC[i]<<" ";
+  }
+  std::cout<<std::endl;*/
+  std::vector<int> node_to_chain(meg.size(), 1);
+  /*for(int i=0;i<chain_to_stream.size();i++){
+    std::cout<<chain_to_stream[i]<<" ";
+  }
+  std::cout<<std::endl;*/
+  int group_num=1;
+  for(int i=0;i<longestC.size();i++){
+    //std::cout<<"Hello "<<longestC[i]<<" "<<node_to_chain.size()<<std::endl;
+    node_to_chain[longestC[i]]=0;
+  }
+  for(int i=0;i<node_to_chain.size();i++){
+    if(node_to_chain[i]==0){
+      continue;
+    }
+    node_to_chain[i]=group_num;
+    group_num++;
+  }
+  std::vector<int> chain_to_stream(group_num, 1);
+  chain_to_stream[0]=0;
+  int stream_num = 2;
+  if(chain_to_stream.size() < stream_num){
+    stream_num = chain_to_stream.size();
+  }
+  return std::make_tuple(node_to_chain, chain_to_stream, stream_num);
+}
+
+///////////// Topological longest chain
+
+void topo_helper(int u, const Graph& g, std::stack<int> &s, std::vector<int> &v) {
+    if(v[u]!=-1){
+        return;
+    }
+    v[u] = 0;
+    for(int i=0;i<g[u].size();i++){
+        topo_helper(g[u][i], g, s, v);
+    }
+    s.push(u);
+}
+
+std::vector<int> topological(const Graph& meg) {
+    std::stack<int> s;
+    std::vector<int> v(meg.size(), -1);
+    for(int i=0;i<meg.size();i++){
+        topo_helper(i, meg, s, v);
+    }
+    std::vector<int> res;
+    while(!s.empty()){
+        res.push_back(s.top());
+        s.pop();
+    }
+    return res;
+}
+
+std::vector<int> getNumPreds(const Graph& g){
+    std::vector<int> pred(g.size(), 0);
+    for(int i=0;i<g.size();i++){
+        for(int j=0;j<g[i].size();j++){
+            pred[g[i][j]] = pred[g[i][j]]+1;
+        }
+    }
+    return pred;
+}
+
+
+std::vector<std::vector<int> > getChains(const Graph &g){
+    std::vector<int> topo = topological(g);
+    std::cout<<"Got topology"<<std::endl;
+    printVec(topo);
+    std::vector<std::vector<int> > allChains;
+    std::vector<int> vis(g.size(), -1);
+    std::vector<int> pred = getNumPreds(g);
+    std::cout<<"Got predecessors"<<std::endl;
+    printVec(pred);
+
+    int allAssigned = 0;
+    while(allAssigned<g.size()){
+        std::cout<<"visited "<<allAssigned<<" "<<g.size()<<std::endl;
+        printVec(vis);
+        printVec(pred);
+        std::vector<int> l2;
+        for(int i=0;i<topo.size();i++){
+            if(vis[topo[i]]!=-1 || pred[topo[i]]>0){
+                continue;
+            }
+	    std::cout<<"VIS: "<<topo[i]<<" "<<vis[topo[i]]<<" "<<pred[topo[i]]<<" Longest chain:"<<std::endl;
+	    std::vector<int> l1 = longestCHelper(topo[i], g, vis, std::vector<int>());
+	    printVec(l1);
+            if(l1.size()>l2.size()){
+                l2=l1;
+            }
+        }
+	std::cout<<"longest chain so far"<<std::endl;
+	printVec(l2);
+        for(int i=0;i<l2.size();i++){
+            vis[l2[i]]=0;
+            allAssigned++;
+            for(int j=0;j<g[l2[i]].size();j++){
+                pred[g[l2[i]][j]] = pred[g[l2[i]][j]]-1;
+            }
+        }
+        allChains.push_back(l2);
+
+    for(int i=0;i<allChains.size();i++){
+        std::cout<<"Chains in processing ";
+	printVec(allChains[i]);
+    }
+    }
+    for(int i=0;i<allChains.size();i++){
+        std::cout<<"Chains "<<std::endl;
+	printVec(allChains[i]);
+    }
+    return allChains;
+}
+
+std::tuple<std::vector<int>, std::vector<int>, int>  get_mapping_topo(const Graph& g){
+    int c1=0, c2=0;
+    std::vector<std::vector<int> > allChains = getChains(g);
+    std::vector<int> node_to_chain(g.size(), 0);
+    std::vector<int> chain_to_stream(allChains.size(), 0);
+    for(int i=0;i<allChains.size();i++){
+        for(int j=0;j<allChains[i].size();j++){
+            node_to_chain[allChains[i][j]] = i;
+        }
+         if(c2<c1){
+             chain_to_stream[i] = 1;
+             c2+=allChains[i].size();
+         }
+         else{
+            chain_to_stream[i] = 0;
+            c1+=allChains[i].size();
+         }
+
+    }
+    int stream_num = 2;
+    if(allChains.size()<2){
+        stream_num = 1;
+    }
+    /*
+    for(int i=0;i<node_to_chain.size();i++){
+        cout<<node_to_chain[i]<<" ";
+    }
+    cout<<endl;
+    for(int i=0;i<chain_to_stream.size();i++){
+        cout<<chain_to_stream[i]<<" ";
+    }
+    cout<<endl;
+    */
+    return std::make_tuple(node_to_chain, chain_to_stream, stream_num);
+}
+
+
+
 } // namespace DAGDecomposition
+

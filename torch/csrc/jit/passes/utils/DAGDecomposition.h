@@ -44,5 +44,7 @@ Bigraph meg_to_bigraph(const Graph& meg);
 Bigraph dag_to_bigraph(const Graph& dag);
 std::vector<int> maximum_matching(const Bigraph& graph);
 std::tuple<std::vector<int>, std::vector<std::array<int, 2>>, int> get_mapping(const std::vector<int>& matching_BtoA);
+std::tuple<std::vector<int>, std::vector<int>, int> get_mapping_two_streams(const Graph& meg, const std::vector<int>& root_node_ids);
+std::tuple<std::vector<int>, std::vector<int>, int>  get_mapping_topo(const Graph& g);
 
 } // namespace DAGDecomposition

@@ -16,5 +16,12 @@
     "darts": [
         "darts",
         "amoebanet"
+    ],
+    "new_exp": [
+    	"linear",
+	"branched",
+	"doublemodel",
+	"branchedsimple",
+	"paper"
     ]
 }

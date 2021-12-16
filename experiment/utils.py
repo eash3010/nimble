@@ -57,6 +57,11 @@ def get_image_size(model_name):
         'inception_v3': 299,
         'nasnetalarge': 331,
         'efficientnet_b5': 456,
+        'doublemodel': 32,
+        'branchedsimple': 40,
+        'branched': 40,
+        'linear': 40,
+        'paper': 40,
     }
     return image_size_dict.get(model_name, 224)
 
@@ -79,6 +84,9 @@ def get_model(model_name, pretrained=True, num_classes=NUM_CLASSES_IMAGENET):
     elif model_to_repo[model_name] == 'darts':
         import darts
         model = getattr(darts, model_name)()
+    elif model_to_repo[model_name] == 'new_exp':
+        import new_exp
+        model = getattr(new_exp, model_name)()
     return model.cuda().eval()
 
 

@@ -28,6 +28,7 @@
 import torch
 import copy
 import types
+from pprint import pprint
 
 
 def _capture_stream(is_origin=True):
@@ -239,6 +240,8 @@ class Nimble(object):
             self.forward_graph, self.use_tuple_as_output, self.backward_graph, self.nimble_autograd_fn = self.build_training_graph(rewritten_module, dummy_inputs, use_multi_stream, relaxed)
         else:
             self.forward_graph, self.use_tuple_as_output = self.build_inference_graph(rewritten_module, dummy_inputs, use_multi_stream, relaxed)
+
+        #pprint(self.forward_graph)
 
         # revert changes
         self.original_module.load_state_dict(init_state)
